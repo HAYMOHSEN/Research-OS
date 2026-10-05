@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Research OS — a calm productivity dashboard for academics and researchers: priority tasks, daily research habits, a focus timer and insights. Works offline, all data stays on your device.">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#f3f3f3" id="meta-theme-color">
+  <meta name="application-name" content="Research OS">
+  <title>Research OS</title>
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./icons/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="./styles.css">
+  <script>
+    // Apply the saved theme before first paint to avoid a flash.
+    (function () {
+      try {
+        var s = JSON.parse(localStorage.getItem('researchos.v1') || '{}');
+        var t = (s && s.settings && s.settings.theme) || 'system';
+        if (t === 'system') t = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        document.documentElement.dataset.theme = t;
+      } catch (e) { /* ignore */ }
+    })();
+  </script>
+</head>
+<body>
+  <svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true" id="icon-sprite">
+  <symbol id="i-microscope" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 18h8" /><path d="M3 22h18" /><path d="M14 22a7 7 0 1 0 0-14h-1" /><path d="M9 14h2" /><path d="M9 12a2 2 0 0 1-2-2V6h6v4a2 2 0 0 1-2 2Z" /><path d="M12 6V3a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v3" /></symbol>
+  <symbol id="i-list-checks" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 5h8" /><path d="M13 12h8" /><path d="M13 19h8" /><path d="m3 17 2 2 4-4" /><path d="m3 7 2 2 4-4" /></symbol>
+  <symbol id="i-repeat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m17 2 4 4-4 4" /><path d="M3 11v-1a4 4 0 0 1 4-4h14" /><path d="m7 22-4-4 4-4" /><path d="M21 13v1a4 4 0 0 1-4 4H3" /></symbol>
+  <symbol id="i-timer" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="10" x2="14" y1="2" y2="2" /><line x1="12" x2="15" y1="14" y2="11" /><circle cx="12" cy="14" r="8" /></symbol>
+  <symbol id="i-chart-column" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v16a2 2 0 0 0 2 2h16" /><path d="M18 17V9" /><path d="M13 17V5" /><path d="M8 17v-3" /></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14" /><path d="M12 5v14" /></symbol>
+  <symbol id="i-trash-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 11v6" /><path d="M14 11v6" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" /><path d="M3 6h18" /><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18" /><path d="m6 6 12 12" /></symbol>
+  <symbol id="i-flame" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3q1 4 4 6.5t3 5.5a1 1 0 0 1-14 0 5 5 0 0 1 1-3 1 1 0 0 0 5 0c0-2-1.5-3-1.5-5q0-2 2.5-4" /></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5" /></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z" /></symbol>
+  <symbol id="i-pause" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="14" y="3" width="5" height="18" rx="1" /><rect x="5" y="3" width="5" height="18" rx="1" /></symbol>
+  <symbol id="i-rotate-ccw" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /><path d="M3 3v5h5" /></symbol>
+  <symbol id="i-skip-forward" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 4v16" /><path d="M6.029 4.285A2 2 0 0 0 3 6v12a2 2 0 0 0 3.029 1.715l9.997-5.998a2 2 0 0 0 .003-3.432z" /></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401" /></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4" /><path d="M12 2v2" /><path d="M12 20v2" /><path d="m4.93 4.93 1.41 1.41" /><path d="m17.66 17.66 1.41 1.41" /><path d="M2 12h2" /><path d="M20 12h2" /><path d="m6.34 17.66-1.41 1.41" /><path d="m19.07 4.93-1.41 1.41" /></symbol>
+  <symbol id="i-sun-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v2" /><path d="M14.837 16.385a6 6 0 1 1-7.223-7.222c.624-.147.97.66.715 1.248a4 4 0 0 0 5.26 5.259c.589-.255 1.396.09 1.248.715" /><path d="M16 12a4 4 0 0 0-4-4" /><path d="m19 5-1.256 1.256" /><path d="M20 12h2" /></symbol>
+  <symbol id="i-settings" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915" /><circle cx="12" cy="12" r="3" /></symbol>
+  <symbol id="i-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3" /><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><path d="m7 10 5 5 5-5" /></symbol>
+  <symbol id="i-upload" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12" /><path d="m17 8-5-5-5 5" /><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /></symbol>
+  <symbol id="i-calendar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v3" /><path d="M16 2v3" /><rect x="3" y="3" width="18" height="18" rx="2" /><path d="M3 9h18" /></symbol>
+  <symbol id="i-flag" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22V4a1 1 0 0 1 .4-.8A6 6 0 0 1 8 2c3 0 5 2 7.333 2q2 0 3.067-.8A1 1 0 0 1 20 4v10a1 1 0 0 1-.4.8A6 6 0 0 1 16 16c-3 0-5-2-8-2a6 6 0 0 0-4 1.528" /></symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.268 21a2 2 0 0 0 3.464 0" /><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326" /></symbol>
+  <symbol id="i-bell-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.268 21a2 2 0 0 0 3.464 0" /><path d="M17 17H4a1 1 0 0 1-.74-1.673C4.59 13.956 6 12.499 6 8a6 6 0 0 1 .258-1.742" /><path d="m2 2 20 20" /><path d="M8.668 3.01A6 6 0 0 1 18 8c0 2.687.77 4.653 1.707 6.05" /></symbol>
+  <symbol id="i-volume-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z" /><path d="M16 9a5 5 0 0 1 0 6" /><path d="M19.364 18.364a9 9 0 0 0 0-12.728" /></symbol>
+  <symbol id="i-volume-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4.702a.7.7 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.7.7 0 0 0 11 19.298z" /><path d="m16.5 14.5 5-5" /><path d="m16.5 9.5 5 5" /></symbol>
+  <symbol id="i-pencil" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" /><path d="m15 5 4 4" /></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" /><path d="M12 16v-4" /><path d="M12 8h.01" /></symbol>
+  <symbol id="i-triangle-alert" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3" /><path d="M12 9v4" /><path d="M12 17h.01" /></symbol>
+  <symbol id="i-refresh-cw" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" /><path d="M21 3v5h-5" /><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" /><path d="M8 16H3v5" /></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" /></symbol>
+  <symbol id="i-target" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" /><circle cx="12" cy="12" r="6" /><circle cx="12" cy="12" r="2" /></symbol>
+  <symbol id="i-keyboard" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 8h.01" /><path d="M12 12h.01" /><path d="M14 8h.01" /><path d="M16 12h.01" /><path d="M18 8h.01" /><path d="M6 8h.01" /><path d="M7 16h10" /><path d="M8 12h.01" /><rect width="20" height="16" x="2" y="4" rx="2" /></symbol>
+  <symbol id="i-circle-check-big" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.801 10A10 10 0 1 1 17 3.335" /><path d="m9 11 3 3L22 4" /></symbol>
+  <symbol id="i-coffee" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v2" /><path d="M14 2v2" /><path d="M16 8a1 1 0 0 1 1 1v8a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V9a1 1 0 0 1 1-1h14a4 4 0 1 1 0 8h-1" /><path d="M6 2v2" /></symbol>
+  <symbol id="i-sparkles" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z" /><path d="M20 2v4" /><path d="M22 4h-4" /><circle cx="4" cy="20" r="2" /></symbol>
+  <symbol id="i-zap" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15.914 4a1.5 1.5 0 00-2.474-1.561l-9 9A1.5 1.5 0 005.5 14h4.002a.5.5 0 01.471.666L8.086 20a1.5 1.5 0 002.475 1.56l9-9A1.5 1.5 0 0018.5 10h-3.997a.5.5 0 01-.472-.667z" /></symbol>
+  <symbol id="i-trophy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 14.66V17a1 1 0 0 1-1 1 2 2 0 0 0-2 2v2" /><path d="M14 14.66V17a1 1 0 0 0 1 1 2 2 0 0 1 2 2v2" /><path d="M17.916 10H19.5A2.5 2.5 0 0 0 22 7.5V5a1 1 0 0 0-1-1h-3" /><path d="M4 22h16" /><path d="M6 9a6 6 0 0 0 12 0V3a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1z" /><path d="M6.084 10H4.5A2.5 2.5 0 0 1 2 7.5V5a1 1 0 0 1 1-1h3" /></symbol>
+  <symbol id="i-chevron-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6" /></symbol>
+  <symbol id="i-shield-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" /><path d="m9 12 2 2 4-4" /></symbol>
+  <symbol id="i-database" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3" /><path d="M3 5V19A9 3 0 0 0 21 19V5" /><path d="M3 12A9 3 0 0 0 21 12" /></symbol>
+  <symbol id="i-book-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v16" /><path d="M20.001 19A2 2 0 0022 17V5a2 2 0 00-1.999-2L16 3.002A5 5 0 0012 5a5 5 0 00-4-2H4a2 2 0 00-2 2v12a2 2 0 001.999 2H8a5 5 0 014 2 5 5 0 014-2z" /></symbol>
+  <symbol id="i-check-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 7 17l-5-5" /><path d="m22 10-7.5 7.5L13 16" /></symbol>
+  <symbol id="i-graduation-cap" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z" /><path d="M22 10v6" /><path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5" /></symbol>
+  <symbol id="i-hourglass" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 22h14" /><path d="M5 2h14" /><path d="M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22" /><path d="M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2" /></symbol>
+  <symbol id="i-calendar-days" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v3" /><path d="M16 2v3" /><rect x="3" y="3" width="18" height="18" rx="2" /><path d="M3 9h18" /><path d="M8 13h.01" /><path d="M12 13h.01" /><path d="M16 13h.01" /><path d="M8 17h.01" /><path d="M12 17h.01" /><path d="M16 17h.01" /></symbol>
+  <symbol id="i-circle-alert" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" /><line x1="12" x2="12" y1="8" y2="12" /><line x1="12" x2="12.01" y1="16" y2="16" /></symbol>
+  <symbol id="i-lightbulb" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5" /><path d="M9 18h6" /><path d="M10 22h4" /></symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7" /><rect x="2" y="4" width="20" height="16" rx="2" /></symbol>
+  <symbol id="i-brain" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 18V5" /><path d="M15 13a4.17 4.17 0 0 1-3-4 4.17 4.17 0 0 1-3 4" /><path d="M17.598 6.5A3 3 0 1 0 12 5a3 3 0 1 0-5.598 1.5" /><path d="M17.997 5.125a4 4 0 0 1 2.526 5.77" /><path d="M18 18a4 4 0 0 0 2-7.464" /><path d="M19.967 17.483A4 4 0 1 1 12 18a4 4 0 1 1-7.967-.517" /><path d="M6 18a4 4 0 0 1-2-7.464" /><path d="M6.003 5.125a4 4 0 0 0-2.526 5.77" /></symbol>
+  <symbol id="i-laptop" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 5a2 2 0 0 1 2 2v8.526a2 2 0 0 0 .212.897l1.068 2.127a1 1 0 0 1-.9 1.45H3.62a1 1 0 0 1-.9-1.45l1.068-2.127A2 2 0 0 0 4 15.526V7a2 2 0 0 1 2-2z" /><path d="M20.054 15.987H3.946" /></symbol>
+</svg>
+
+  <div class="ambient" aria-hidden="true">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+  </div>
+
+  <header class="titlebar" id="titlebar">
+    <div class="titlebar-inner">
+      <div class="brand">
+        <span class="brand-mark"><svg class="icon" aria-hidden="true"><use href="#i-microscope"/></svg></span>
+        <span class="brand-name">Research OS</span>
+      </div>
+      <div class="titlebar-actions">
+        <span id="today-label" class="today-label"></span>
+        <button class="btn-icon" id="btn-theme" type="button" title="Switch theme" aria-label="Switch theme">
+          <svg class="icon" aria-hidden="true"><use href="#i-moon" id="theme-icon-use"/></svg>
+        </button>
+        <button class="btn-icon" id="btn-settings" type="button" title="Settings (Ctrl+,)" aria-label="Settings">
+          <svg class="icon" aria-hidden="true"><use href="#i-settings"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="app">
+    <section class="page-head">
+      <h1 id="greeting">Good morning</h1>
+      <p id="summary" class="subtle"></p>
+    </section>
+
+    <section class="card welcome" id="welcome" hidden aria-labelledby="welcome-title">
+      <div class="welcome-icon"><svg class="icon icon-24" aria-hidden="true"><use href="#i-sparkles"/></svg></div>
+      <div class="welcome-body">
+        <h2 id="welcome-title">Welcome to Research OS</h2>
+        <p>Add the tasks that matter this week, build a few daily research habits, and run focus sessions when you need deep work. Everything is saved on this PC — no account, no cloud.</p>
+      </div>
+      <div class="welcome-actions">
+        <button class="btn btn-accent" type="button" id="welcome-settings">Set your name &amp; timer</button>
+        <button class="btn" type="button" id="welcome-dismiss">Got it</button>
+      </div>
+    </section>
+
+    <div class="grid">
+      <div class="col-main">
+
+        <!-- Tasks -->
+        <section class="card module" id="tasks-module" aria-labelledby="tasks-title">
+          <header class="module-head">
+            <div class="module-title">
+              <svg class="icon icon-20 c-tasks" aria-hidden="true"><use href="#i-list-checks"/></svg>
+              <h2 id="tasks-title">Priority tasks</h2>
+            </div>
+            <div class="module-tools">
+              <div class="chips" role="group" aria-label="Filter tasks" id="task-filters">
+                <button type="button" class="chip is-active" data-filter="all" aria-pressed="true">All</button>
+                <button type="button" class="chip" data-filter="active" aria-pressed="false">Active</button>
+                <button type="button" class="chip" data-filter="done" aria-pressed="false">Done</button>
+              </div>
+              <span class="badge badge-tasks" id="task-progress">0/0 done</span>
+            </div>
+          </header>
+
+          <form id="task-form" class="add-row" autocomplete="off">
+            <input id="task-input" class="input grow" type="text" maxlength="200" required
+                   placeholder="Add a task… e.g. Revise Section 4 of the manuscript" aria-label="New task">
+            <div class="seg seg-sm" role="radiogroup" aria-label="Priority">
+              <label class="seg-item"><input type="radio" name="priority" value="low"><span>Low</span></label>
+              <label class="seg-item"><input type="radio" name="priority" value="medium" checked><span>Medium</span></label>
+              <label class="seg-item"><input type="radio" name="priority" value="high"><span>High</span></label>
+            </div>
+            <input type="date" id="task-due" class="input input-date" aria-label="Due date (optional)" title="Due date (optional)">
+            <button type="submit" class="btn btn-accent">
+              <svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg><span>Add</span>
+            </button>
+          </form>
+
+          <div id="task-list" class="list" role="list"></div>
+          <div class="empty" id="tasks-empty" hidden>
+            <svg class="icon icon-24" aria-hidden="true"><use href="#i-circle-check-big"/></svg>
+            <p id="tasks-empty-text">No tasks yet. Add the first thing you need to get done.</p>
+          </div>
+          <footer class="module-foot" id="tasks-foot" hidden>
+            <span class="subtle" id="tasks-foot-text"></span>
+            <button class="btn btn-subtle" type="button" id="btn-clear-done">
+              <svg class="icon" aria-hidden="true"><use href="#i-check-check"/></svg><span>Clear completed</span>
+            </button>
+          </footer>
+        </section>
+
+        <!-- Habits -->
+        <section class="card module" id="habits-module" aria-labelledby="habits-title">
+          <header class="module-head">
+            <div class="module-title">
+              <svg class="icon icon-20 c-habits" aria-hidden="true"><use href="#i-repeat"/></svg>
+              <h2 id="habits-title">Daily research habits</h2>
+            </div>
+            <span class="badge badge-habits" id="habit-progress">0/0 today</span>
+          </header>
+
+          <form id="habit-form" class="add-row" autocomplete="off">
+            <input id="habit-input" class="input grow" type="text" maxlength="120" required
+                   placeholder="Add a daily habit… e.g. Read one paper" aria-label="New habit">
+            <button type="submit" class="btn btn-accent btn-habits">
+              <svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg><span>Add</span>
+            </button>
+          </form>
+
+          <div id="habit-list" class="habit-grid" role="list"></div>
+          <div class="empty" id="habits-empty" hidden>
+            <svg class="icon icon-24" aria-hidden="true"><use href="#i-flame"/></svg>
+            <p>No habits yet. Small daily actions — reading one paper, writing 300 words — compound into research output.</p>
+          </div>
+        </section>
+      </div>
+
+      <div class="col-side">
+
+        <!-- Focus timer -->
+        <section class="card module timer-module" aria-labelledby="timer-title">
+          <header class="module-head center">
+            <div class="module-title">
+              <svg class="icon icon-20 c-timer" aria-hidden="true"><use href="#i-timer"/></svg>
+              <h2 id="timer-title">Deep work</h2>
+            </div>
+          </header>
+
+          <div class="seg modes" role="tablist" aria-label="Timer mode" id="mode-tabs">
+            <button type="button" role="tab" class="seg-btn is-active" data-mode="focus" aria-selected="true">Focus</button>
+            <button type="button" role="tab" class="seg-btn" data-mode="short" aria-selected="false">Short break</button>
+            <button type="button" role="tab" class="seg-btn" data-mode="long" aria-selected="false">Long break</button>
+          </div>
+
+          <div class="ring-wrap">
+            <svg class="ring" viewBox="0 0 220 220" aria-hidden="true">
+              <circle class="ring-track" cx="110" cy="110" r="100"/>
+              <circle class="ring-fill" cx="110" cy="110" r="100" id="ring-fill"/>
+            </svg>
+            <div class="ring-center">
+              <div class="time" id="timer-display" role="timer" aria-live="off">25:00</div>
+              <div class="mode-label" id="timer-mode-label">Focus</div>
+            </div>
+          </div>
+
+          <div class="cycle-dots" id="cycle-dots" role="img" aria-label="Sessions until long break"></div>
+
+          <div class="timer-controls">
+            <button class="btn-icon lg" type="button" id="btn-reset" title="Reset" aria-label="Reset timer">
+              <svg class="icon" aria-hidden="true"><use href="#i-rotate-ccw"/></svg>
+            </button>
+            <button class="btn-play" type="button" id="btn-toggle" aria-label="Start" title="Start (Space)">
+              <svg class="icon icon-28" aria-hidden="true"><use href="#i-play" id="play-use"/></svg>
+            </button>
+            <button class="btn-icon lg" type="button" id="btn-skip" title="Skip to next" aria-label="Skip to next">
+              <svg class="icon" aria-hidden="true"><use href="#i-skip-forward"/></svg>
+            </button>
+          </div>
+          <p class="status" id="timer-status" aria-live="polite">Ready when you are.</p>
+        </section>
+
+        <!-- Insights -->
+        <section class="card module" id="insights-module" aria-labelledby="insights-title">
+          <header class="module-head">
+            <div class="module-title">
+              <svg class="icon icon-20 c-insights" aria-hidden="true"><use href="#i-chart-column"/></svg>
+              <h2 id="insights-title">Insights</h2>
+            </div>
+          </header>
+          <div class="stats">
+            <div class="stat"><span class="stat-label">Focus sessions today</span><span class="stat-value" id="stat-sessions-today">0</span></div>
+            <div class="stat"><span class="stat-label">Focus time today</span><span class="stat-value" id="stat-minutes-today">0m</span></div>
+            <div class="stat"><span class="stat-label">Tasks completed</span><span class="stat-value" id="stat-tasks-total">0</span></div>
+            <div class="stat"><span class="stat-label">Longest habit streak</span><span class="stat-value" id="stat-best-streak">0</span></div>
+          </div>
+          <div class="week">
+            <div class="week-head">
+              <span class="stat-label">Focus minutes, last 7 days</span>
+              <span class="subtle" id="week-total">0m</span>
+            </div>
+            <div class="week-bars" id="week-bars"></div>
+            <div class="week-days" id="week-days" aria-hidden="true"></div>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <footer class="page-foot subtle">
+      <span>Research OS · stored on this device only</span>
+      <a href="./privacy.html" target="_blank" rel="noopener">Privacy</a>
+    </footer>
+  </main>
+
+  <!-- Settings -->
+  <dialog id="settings-dialog" class="dialog" aria-labelledby="settings-title">
+    <div class="dialog-card">
+      <header class="dialog-head">
+        <h2 id="settings-title">Settings</h2>
+        <button type="button" class="btn-icon" id="settings-close" aria-label="Close settings">
+          <svg class="icon" aria-hidden="true"><use href="#i-x"/></svg>
+        </button>
+      </header>
+      <div class="dialog-body">
+
+        <section class="settings-group">
+          <h3>Profile</h3>
+          <label class="field">
+            <span>Your name (used in the greeting)</span>
+            <input type="text" id="set-name" class="input" maxlength="40" placeholder="e.g. Dr. Hartmann" autocomplete="off">
+          </label>
+        </section>
+
+        <section class="settings-group">
+          <h3>Timer</h3>
+          <div class="field-row">
+            <label class="field num"><span>Focus</span><span class="num-wrap"><input type="number" id="set-focus" class="input" min="1" max="180" step="1"><em>min</em></span></label>
+            <label class="field num"><span>Short break</span><span class="num-wrap"><input type="number" id="set-short" class="input" min="1" max="60" step="1"><em>min</em></span></label>
+            <label class="field num"><span>Long break</span><span class="num-wrap"><input type="number" id="set-long" class="input" min="1" max="120" step="1"><em>min</em></span></label>
+            <label class="field num"><span>Long break after</span><span class="num-wrap"><input type="number" id="set-every" class="input" min="1" max="12" step="1"><em>sessions</em></span></label>
+          </div>
+          <label class="switch"><input type="checkbox" id="set-autobreak"><span class="switch-ui"></span><span>Start breaks automatically</span></label>
+          <label class="switch"><input type="checkbox" id="set-autofocus"><span class="switch-ui"></span><span>Start the next focus session automatically after a break</span></label>
+        </section>
+
+        <section class="settings-group">
+          <h3>When a session ends</h3>
+          <label class="switch"><input type="checkbox" id="set-sound"><span class="switch-ui"></span><span>Play a soft chime</span></label>
+          <label class="switch"><input type="checkbox" id="set-notify"><span class="switch-ui"></span><span>Show a Windows notification</span></label>
+          <p class="hint" id="notify-hint"></p>
+        </section>
+
+        <section class="settings-group">
+          <h3>Appearance</h3>
+          <div class="seg" role="radiogroup" aria-label="Theme" id="theme-seg">
+            <label class="seg-item"><input type="radio" name="theme" value="system"><span><svg class="icon" aria-hidden="true"><use href="#i-sun-moon"/></svg>System</span></label>
+            <label class="seg-item"><input type="radio" name="theme" value="light"><span><svg class="icon" aria-hidden="true"><use href="#i-sun"/></svg>Light</span></label>
+            <label class="seg-item"><input type="radio" name="theme" value="dark"><span><svg class="icon" aria-hidden="true"><use href="#i-moon"/></svg>Dark</span></label>
+          </div>
+        </section>
+
+        <section class="settings-group">
+          <h3>Your data</h3>
+          <p class="hint">Tasks, habits and sessions are stored only in this app on this PC. Export a backup before moving to another computer or reinstalling.</p>
+          <div class="btn-row">
+            <button type="button" class="btn" id="btn-export"><svg class="icon" aria-hidden="true"><use href="#i-download"/></svg><span>Export backup</span></button>
+            <button type="button" class="btn" id="btn-import"><svg class="icon" aria-hidden="true"><use href="#i-upload"/></svg><span>Restore backup…</span></button>
+            <button type="button" class="btn btn-danger" id="btn-reset-all"><svg class="icon" aria-hidden="true"><use href="#i-trash-2"/></svg><span>Erase all data</span></button>
+          </div>
+        </section>
+
+        <section class="settings-group">
+          <h3>Keyboard shortcuts</h3>
+          <dl class="shortcuts">
+            <div><dt><kbd>Space</kbd></dt><dd>Start or pause the timer (when not typing)</dd></div>
+            <div><dt><kbd>/</kbd></dt><dd>Jump to the new-task box</dd></div>
+            <div><dt><kbd>Ctrl</kbd> + <kbd>,</kbd></dt><dd>Open settings</dd></div>
+            <div><dt><kbd>Esc</kbd></dt><dd>Close dialogs, cancel editing</dd></div>
+          </dl>
+        </section>
+
+        <section class="settings-group about">
+          <h3>About</h3>
+          <p><strong>Research OS</strong> <span id="app-version">1.0.0</span> — a focused workspace for academics and researchers.</p>
+          <p class="hint">Support: <a href="mailto:haymohsen@gmail.com">haymohsen@gmail.com</a> · <a href="./privacy.html" target="_blank" rel="noopener">Privacy policy</a><br>Icons by <a href="https://lucide.dev" target="_blank" rel="noopener">Lucide</a> (ISC licence).</p>
+        </section>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Generic confirm -->
+  <dialog id="confirm-dialog" class="dialog dialog-sm" aria-labelledby="confirm-title">
+    <div class="dialog-card">
+      <header class="dialog-head"><h2 id="confirm-title">Are you sure?</h2></header>
+      <div class="dialog-body"><p id="confirm-message"></p></div>
+      <footer class="dialog-foot">
+        <button type="button" class="btn" id="confirm-cancel">Cancel</button>
+        <button type="button" class="btn btn-accent" id="confirm-ok">Confirm</button>
+      </footer>
+    </div>
+  </dialog>
+
+  <div id="toasts" class="toasts" aria-live="polite" aria-relevant="additions"></div>
+  <input type="file" id="import-file" accept="application/json,.json" hidden>
+
+  <script src="./app.js"></script>
+</body>
+</html>

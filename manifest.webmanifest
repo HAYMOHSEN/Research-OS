@@ -1,0 +1,43 @@
+{
+  "name": "Research OS",
+  "short_name": "Research OS",
+  "description": "A calm productivity dashboard for academics and researchers: priority tasks with due dates, daily research habits with streaks, a focus timer with breaks, and insights. Works offline — all data stays on your device.",
+  "lang": "en",
+  "dir": "ltr",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone"],
+  "orientation": "any",
+  "background_color": "#f3f3f3",
+  "theme_color": "#f3f3f3",
+  "categories": ["productivity", "education", "utilities"],
+  "prefer_related_applications": false,
+  "launch_handler": { "client_mode": "navigate-existing" },
+  "icons": [
+    { "src": "./icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "./icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "./icons/maskable-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "./icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "screenshots": [
+    { "src": "./screenshots/dashboard-light.png", "sizes": "1920x1080", "type": "image/png", "form_factor": "wide", "label": "Dashboard with priority tasks, daily habits, focus timer and insights (light)" },
+    { "src": "./screenshots/dashboard-dark.png", "sizes": "1920x1080", "type": "image/png", "form_factor": "wide", "label": "Dashboard in dark mode with a focus session running" }
+  ],
+  "shortcuts": [
+    {
+      "name": "Start a focus session",
+      "short_name": "Focus",
+      "description": "Start the focus timer right away",
+      "url": "./?action=focus",
+      "icons": [{ "src": "./icons/shortcut-focus-96.png", "sizes": "96x96", "type": "image/png" }]
+    },
+    {
+      "name": "Add a task",
+      "short_name": "Add task",
+      "description": "Open Research OS with the new-task box focused",
+      "url": "./?action=add-task",
+      "icons": [{ "src": "./icons/shortcut-task-96.png", "sizes": "96x96", "type": "image/png" }]
+    }
+  ]
+}
